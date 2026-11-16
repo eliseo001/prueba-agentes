@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const http = require('http'); // <-- Nuevo: Para llamar a la API de Ollama
+const http = require('http');
 
 const db = new sqlite3.Database('./tasks.db');
 
@@ -92,15 +92,19 @@ function runPendingTasks() {
             
             db.run(`UPDATE tasks SET status = 'RUNNING', attempts = attempts + 1 WHERE id = ?`, [task.id]);
 
-            let fileStream = null;
+            // Crear el directorio si no existe (pero aún no el WriteStream)
             if (task.output_file) {
                 const dir = path.dirname(task.output_file);
                 if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-                fileStream = fs.createWriteStream(task.output_file);
             }
 
             // === LÓGICA PARA NODOS REMOTOS (SSH / Comandos normales) ===
             if (task.target_node !== 'local') {
+                let fileStream = null;
+                if (task.output_file) {
+                    fileStream = fs.createWriteStream(task.output_file);
+                }
+
                 const parts = task.command.split(' ');
                 const child = spawn(parts[0], parts.slice(1), { shell: true });
                 let bytesWritten = 0;
@@ -125,9 +129,9 @@ function runPendingTasks() {
             
             // === LÓGICA PARA IA (API de Ollama) ===
             else {
-                // Extraer el prompt puro (limpia si el usuario puso 'ollama run' por costumbre)
                 let model = 'qwen2.5-coder:7b';
                 let prompt = task.command;
+                let respuestaAcumulada = ""; // <--- AQUÍ GUARDAMOS TODO EL TEXTO
                 
                 if (prompt.startsWith("ollama run") || prompt.startsWith("echo")) {
                     const match = prompt.match(/ollama run ([\w.-:]+)\s+['"]?(.+?)['"]?$/is) || prompt.match(/echo ['"]?(.+?)['"]?\s*\|\s*ollama run ([\w.-:]+)/is);
@@ -138,7 +142,6 @@ function runPendingTasks() {
                     }
                 }
 
-                // El secreto profesional: Instrucciones de sistema para forzar solo código
                 const reqData = JSON.stringify({
                     model: model,
                     prompt: prompt,
@@ -153,9 +156,7 @@ function runPendingTasks() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(reqData) }
                 }, (res) => {
-                    let bytesWritten = 0;
 
-                    // Procesar el texto a medida que llega de la GPU
                     res.on('data', (chunk) => {
                         try {
                             const lines = chunk.toString().split('\n').filter(l => l.trim() !== '');
@@ -163,24 +164,32 @@ function runPendingTasks() {
                                 const json = JSON.parse(line);
                                 if (json.response) {
                                     process.stdout.write(json.response);
-                                    if (fileStream) {
-                                        fileStream.write(json.response);
-                                        bytesWritten += Buffer.byteLength(json.response);
-                                    }
+                                    respuestaAcumulada += json.response; // Acumulamos el texto generado
                                 }
                             }
                         } catch (e) { /* Ignorar trozos incompletos */ }
                     });
 
                     res.on('end', () => {
-                        if (fileStream) fileStream.end();
+                        let bytesWritten = 0;
+                        if (task.output_file && respuestaAcumulada.trim() !== "") {
+                            // === EL FILTRO DE LIMPIEZA SE APLICA AQUÍ ===
+                            let codigoLimpio = respuestaAcumulada;
+                            codigoLimpio = codigoLimpio.replace(/^```(jsx|javascript|js|tsx|ts|html|css)\s*\n/gi, '');
+                            codigoLimpio = codigoLimpio.replace(/```\s*$/g, '');
+                            codigoLimpio = codigoLimpio.replace(/^jsx\s*\n/gi, ''); // Elimina "jsx" suelto en línea 1
+                            codigoLimpio = codigoLimpio.trim();
+
+                            // Guardamos el código ya limpio
+                            fs.writeFileSync(task.output_file, codigoLimpio);
+                            bytesWritten = Buffer.byteLength(codigoLimpio);
+                        }
                         finishTask(task, 0, startTime, bytesWritten);
                     });
                 });
 
                 req.on('error', (e) => {
                     console.error(`\n[ERROR DE API] Error conectando con Ollama: ${e.message}`);
-                    if (fileStream) fileStream.end();
                     finishTask(task, 1, startTime, 0);
                 });
 
