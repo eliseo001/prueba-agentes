@@ -1,16 +1,38 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import AuthProvider from './context/AuthContext.jsx';
-import Dashboard from './features/dashboard/Dashboard.jsx';
+```jsx
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Servicios from './Servicios';
+import Profesionales from './Profesionales';
+import Clientes from './Clientes';
+import Calendario from './Calendario';
+import Turnos from './Turnos';
+import ReservasPublicas from './ReservasPublicas';
 
 const App = () => (
-  <AuthProvider>
-    <Router>
-      <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
-        {/* Agrega más rutas según sea necesario */}
-      </Routes>
-    </Router>
-  </AuthProvider>
+  <Router>
+    <div className="App">
+      <Sidebar />
+      <Switch>
+        <Route path="/b/:slug" component={ReservasPublicas} />
+        <Route exact path="/" render={() => (
+          <>
+            <Servicios />
+            <Profesionales />
+            <Clientes />
+            <Calendario />
+            <Turnos />
+          </>
+        )} />
+      </Switch>
+    </div>
+  </Router>
+);
+
+const Sidebar = () => (
+  <nav className="sidebar">
+    {/* Enlaces a las vistas */}
+  </nav>
 );
 
 export default App;
+```
