@@ -1,50 +1,122 @@
 import React, { useState } from 'react';
 
 const ReservasPublicas = () => {
-    const [servicio, setServicio] = useState('');
-    const [profesional, setProfesional] = useState('');
-    const [horario, setHorario] = useState('');
-    const [nombre, setNombre] = useState('');
-    const [telefono, setTelefono] = useState('');
+  const [selectedService, setSelectedService] = useState('');
+  const [selectedProfessional, setSelectedProfessional] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState('10:00');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
 
-    const servicios = ['Corte de Pelo', 'Tinte', 'Manicure'];
-    const profesionales = ['Juan', 'María', 'Pedro'];
-    const horarios = ['10:00 AM', '12:00 PM', '2:00 PM'];
+  const handleServiceChange = (event) => {
+    setSelectedService(event.target.value);
+  };
 
-    const handleReservar = () => {
-        // Lógica para reservar
-        alert('Reserva realizada con éxito!');
-    };
+  const handleProfessionalChange = (event) => {
+    setSelectedProfessional(event.target.value);
+  };
 
-    return (
-        <div className="p-4">
-            <h1 className="text-xl font-bold mb-4">Realizar Reserva</h1>
-            <select value={servicio} onChange={(e) => setServicio(e.target.value)} className="border p-2 mb-4 w-full">
-                {servicios.map((s, index) => (
-                    <option key={index} value={s}>{s}</option>
-                ))}
-            </select>
-            <select value={profesional} onChange={(e) => setProfesional(e.target.value)} className="border p-2 mb-4 w-full">
-                {profesionales.map((p, index) => (
-                    <option key={index} value={p}>{p}</option>
-                ))}
-            </select>
-            <div className="grid grid-cols-3 gap-4">
-                {horarios.map((h, index) => (
-                    <button
-                        key={index}
-                        onClick={() => setHorario(h)}
-                        className={`border p-2 ${horario === h ? 'bg-blue-500 text-white' : ''}`}
-                    >
-                        {h}
-                    </button>
-                ))}
-            </div>
-            <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Nombre" className="border p-2 mb-4 w-full" />
-            <input type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono" className="border p-2 mb-4 w-full" />
-            <button onClick={handleReservar} className="bg-blue-500 text-white border p-2 w-full">Reservar</button>
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log('Reserva realizada:', {
+      servicio: selectedService,
+      profesional: selectedProfessional,
+      fecha: date.toISOString().split('T')[0],
+      hora: time,
+      nombre: name,
+      telefono: phone
+    });
+  };
+
+  return (
+    <div className="bg-gray-100 p-4 rounded-lg shadow-md">
+      <form onSubmit={handleSubmit}>
+        <select
+          value={selectedService}
+          onChange={handleServiceChange}
+          className="w-full px-4 py-2 mb-3 border rounded"
+        >
+          <option value="">Selecciona un servicio</option>
+          <option value="corte">Corte de pelo</option>
+          <option value="tintura">Tintura</option>
+        </select>
+
+        <select
+          value={selectedProfessional}
+          onChange={handleProfessionalChange}
+          className="w-full px-4 py-2 mb-3 border rounded"
+        >
+          <option value="">Selecciona un profesional</option>
+          <option value="juan">Juan Perez</option>
+          <option value="maria">Maria Gomez</option>
+        </select>
+
+        <div className="mb-3">
+          <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+            Fecha
+          </label>
+          <input
+            type="date"
+            id="date"
+            value={date.toISOString().split('T')[0]}
+            onChange={(e) => setDate(new Date(e.target.value))}
+            className="w-full px-4 py-2 border rounded"
+          />
         </div>
-    );
+
+        <div className="mb-3">
+          <label htmlFor="time" className="block text-sm font-medium text-gray-700">
+            Hora
+          </label>
+          <select
+            id="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="w-full px-4 py-2 border rounded"
+          >
+            <option value="10:00">10:00 AM</option>
+            <option value="11:00">11:00 AM</option>
+            <option value="12:00">12:00 PM</option>
+            <option value="13:00">1:00 PM</option>
+            <option value="14:00">2:00 PM</option>
+          </select>
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            Nombre
+          </label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full px-4 py-2 border rounded"
+          />
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+            Teléfono
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full px-4 py-2 border rounded"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-3 rounded font-medium hover:bg-blue-700"
+        >
+          Reservar
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default ReservasPublicas;
