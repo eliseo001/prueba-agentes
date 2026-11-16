@@ -1,24 +1,24 @@
 import React from 'react';
-import { IconUser } from '@tabler/icons-react';
+import { HiOutlineUserGroup } from 'lucide-react';
 
 const Profesionales = () => {
   const barberos = [
-    { nombre: 'Juan Pérez', especialidad: 'Barbero de cabellera' },
-    { nombre: 'Ana López', especialidad: 'Cortes personalizados' },
-    { nombre: 'Carlos Martínez', especialidad: 'Peinados creativos' }
+    { nombre: 'Juan Pérez', servicio: 'Corte de pelo clásico' },
+    { nombre: 'María López', servicio: 'Peluquería capilar' },
+    { nombre: 'Carlos Ramírez', servicio: 'Despeinado premium' }
   ];
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Nuestros Barberos</h1>
-      <ul className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="bg-white p-4 shadow-md rounded-lg">
+      <h2 className="text-xl font-bold mb-4">Nuestros Barberos</h2>
+      <ul className="space-y-2">
         {barberos.map((barbero, index) => (
-          <li key={index} className="bg-white shadow-lg p-4 rounded-md">
-            <div className="flex items-center mb-2">
-              <IconUser className="text-xl text-blue-500 mr-2" />
-              <span>{barbero.nombre}</span>
+          <li key={index} className="flex items-center space-x-2">
+            <HiOutlineUserGroup className="text-xl" />
+            <div>
+              <p className="font-medium">{barbero.nombre}</p>
+              <p className="text-gray-500">{barbero.servicio}</p>
             </div>
-            <p className="text-gray-700">{barbero.especialidad}</p>
           </li>
         ))}
       </ul>

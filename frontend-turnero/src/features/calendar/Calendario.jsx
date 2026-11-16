@@ -1,30 +1,16 @@
 import React from 'react';
-import { Grid, Box } from '@mui/material';
 
 const Calendario = () => {
-  const horas = Array.from({ length: 12 }, (_, i) => `0${i + 9}:00`);
-  const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
   return (
-    <Grid container spacing={2} sx={{ padding: 2 }}>
-      <Grid item xs={12}>
-        {diasSemana.map((dia, index) => (
-          <Box key={index} display="flex" alignItems="center">
-            {dia}
-          </Box>
-        ))}
-      </Grid>
-      {horas.map((hora, index) => (
-        <Grid container spacing={0.5}>
-          <Grid item xs={1}>
-            {hora}
-          </Grid>
-          {diasSemana.map(() => (
-            <Grid item xs={1} border="1px solid #ccc" />
+    <div className="grid grid-cols-7 gap-2">
+      {[1, 2, 3, 4, 5, 6].map(day => (
+        <div key={day} className="grid grid-rows-9 gap-1 bg-gray-100 p-2">
+          {Array.from({ length: 9 }, (_, hour) => (
+            <div key={hour} className="bg-white border rounded-lg shadow-sm p-1 text-center">{`${8 + hour}:00`}</div>
           ))}
-        </Grid>
+        </div>
       ))}
-    </Grid>
+    </div>
   );
 };
 

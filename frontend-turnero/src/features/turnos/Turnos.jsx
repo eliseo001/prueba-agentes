@@ -1,39 +1,38 @@
 import React from 'react';
-import { ListGroup } from 'react-bootstrap';
 
 const Turnos = ({ turnos }) => {
   return (
-    <ListGroup>
-      {turnos.map((turno, index) => (
-        <ListGroup.Item key={index}>
-          <div className="flex justify-between">
-            <span>{turno.fecha} - {turno.hora}</span>
-            <span>{turno.cliente}</span>
-            <span>{turno.servicio}</span>
-            <span>{turno.profesional}</span>
-            <span>{turno.estado}</span>
-          </div>
-          <div className="flex justify-end">
-            {turno.estado === 'Pendiente' && (
-              <>
-                <button
-                  onClick={() => handleConfirmar(turno.id)}
-                  className="bg-green-500 text-white py-1 px-2 rounded mr-2"
-                >
-                  Confirmar
-                </button>
-                <button
-                  onClick={() => handleCancelar(turno.id)}
-                  className="bg-red-500 text-white py-1 px-2 rounded"
-                >
-                  Cancelar
-                </button>
-              </>
-            )}
-          </div>
-        </ListGroup.Item>
-      ))}
-    </ListGroup>
+    <div className="bg-white shadow-md rounded-lg overflow-hidden">
+      <table className="w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Servicio</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profesional</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+            <th className="px-6 py-3"></th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {turnos.map((turno, index) => (
+            <tr key={index}>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{turno.fecha}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{turno.hora}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{turno.cliente}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{turno.servicio}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{turno.profesional}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{turno.estado}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <button className="px-2 py-1 bg-green-500 text-white rounded" onClick={() => handleConfirm(turno.id)}>Confirmar</button>
+                <button className="px-2 py-1 bg-red-500 text-white rounded ml-2" onClick={() => handleCancel(turno.id)}>Cancelar</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
