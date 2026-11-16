@@ -20,7 +20,10 @@ try {
   local('git push origin main');
 
   for (const tarea of tareasAEjecutar) {
-    console.log('\n=== INICIANDO TAREA EN CADENA: ' + tarea + ' ===');
+    console.log('\n=== INICIANDO TAREA EN BUCLE: ' + tarea + ' ===');
+
+    // Usamos comillas simples o un string seguro para el commit remoto
+    const mensajeCommit = `docs(asus)-resultado-${tarea}`;
 
     const comandosEnAsus = [
       'cd /d "' + ASUS_PATH + '"',
@@ -28,7 +31,7 @@ try {
       'git pull origin main --no-edit',
       'node scripts/asus-worker.mjs ' + tarea,
       'git add docs/',
-      'git commit -m "docs(asus): resultado de ' + tarea + '" || echo "Sin cambios nuevos para commitear"',
+      `git commit -m "${mensajeCommit}" || echo "Sin cambios nuevos para commitear"`,
       'git push origin feature/asus-docs-analysis'
     ].join(' && ');
 
@@ -38,8 +41,8 @@ try {
   local('git fetch origin');
   local('git merge origin/feature/asus-docs-analysis --allow-unrelated-histories --no-edit');
 
-  console.log('\n[MVP Completado] Todas las tareas del pipeline se ejecutaron en la ASUS y sus reportes ya están aquí.');
+  console.log('\n[Bucle MVP Completado] Todas las tareas se ejecutaron y se sincronizaron con éxito.');
 } catch (err) {
-  console.error('\n[Error en el pipeline MVP]:', err.message);
+  console.error('\n[Error en el bucle MVP]:', err.message);
   process.exit(1);
 }
