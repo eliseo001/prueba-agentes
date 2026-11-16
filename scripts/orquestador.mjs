@@ -2,41 +2,47 @@ import { execSync } from 'child_process';
 
 const ASUS_SSH = 'elise@192.168.0.98';
 const ASUS_PATH = 'C:/Users/elise/projects/prueba-agentes';
-const tarea = process.argv[2] || 'revision-estructura';
+
+// Permite pasar múltiples tareas separadas por espacio, ej: node scripts/orquestador.mjs auditoria tests build
+const tareas = process.argv.slice(2);
+const tareasAEjecutar = tareas.length > 0 ? tareas : ['auditoria', 'tests', 'build'];
 
 function local(cmd) {
-  console.log(`\n[PC Principal - main] > ${cmd}`);
+  console.log(`\n[PC Principal] > ${cmd}`);
   execSync(cmd, { stdio: 'inherit' });
 }
 
 function remotoAsus(cmd) {
-  console.log(`\n[Orden hacia ASUS 192.168.0.98] > ${cmd}`);
+  console.log(`\n[Orden hacia ASUS] > ${cmd}`);
   execSync(`ssh ${ASUS_SSH} "${cmd}"`, { stdio: 'inherit' });
 }
 
 try {
-  // 1. Subir los cambios de tu PC principal a GitHub (origin main)
+  // 1. Sincronizar main con GitHub
   local('git push origin main');
 
-  // 2. Ordenar a la ASUS por SSH que haga pull, ejecute el worker y haga push a GitHub
-  const comandosEnAsus = [
-    `cd /d "${ASUS_PATH}"`,
-    `git checkout feature/asus-docs-analysis`,
-    `git pull origin main --no-edit`,
-    `node scripts/asus-worker.mjs ${tarea}`,
-    `git add .`,
-    `git commit -m "docs(asus): ${tarea}" || echo "Sin cambios nuevos"`,
-    `git push origin feature/asus-docs-analysis`
-  ].join(' && ');
+  for (const tarea of tareasAEjecutar) {
+    console.log(`\n=== INICIANDO TAREA EN CADENA: ${tarea} ===`);
 
-  remotoAsus(comandosEnAsus);
+    const comandosEnAsus = [
+      `cd /d "${ASUS_PATH}"`,
+      `git checkout feature/asus-docs-analysis`,
+      `git pull origin main --no-edit`,
+      `node scripts/asus-worker.mjs ${tarea}`,
+      `git add .`,
+      `git commit -m "docs(asus): resultado de ${tarea}" || echo "Sin cambios nuevos"`,
+      `git push origin feature/asus-docs-analysis`
+    ].join(' && ');
 
-  // 3. Traer la rama de la ASUS desde GitHub y fusionarla en tu PC Principal
+    remotoAsus(comandosEnAsus);
+  }
+
+  // 2. Traer todos los reportes consolidados desde GitHub a la PC Principal
   local('git fetch origin');
-  local('git merge origin/feature/asus-docs-analysis --no-edit');
+  local('git merge origin/feature/asus-docs-analysis --allow-unrelated-histories --no-edit');
 
-  console.log('\n[Listo] La ASUS terminó la tarea y los cambios ya están integrados en tu rama main.');
+  console.log('\n[MVP Completado] Todas las tareas del pipeline se ejecutaron en la ASUS y se integraron aquí.');
 } catch (err) {
-  console.error('\n[Error en el flujo]:', err.message);
+  console.error('\n[Error en el pipeline MVP]:', err.message);
   process.exit(1);
 }
