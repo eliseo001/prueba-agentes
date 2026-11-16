@@ -40,15 +40,33 @@ while (bucleActivo) {
       execSync('git push origin main', { stdio: 'inherit' });
       
     } else {
-      console.log('❌ [ERROR] El Build falló en la ASUS. Inyectando tarea de auto-corrección...');
+      console.log('❌ [ERROR] El Build falló en la ASUS.');
       
-      // Limpiamos el error para no romper la consola
-      const logLimpio = contenidoBuild.substring(0, 400).replace(/["'\n\r]/g, ' ');
-      const promptArreglo = `El último build de Vite falló con este error: ${logLimpio}. Revisá las importaciones, sintaxis y corregí el código para que compile. Devolvé EXCLUSIVAMENTE código puro sin comillas.`;
-      
-      // Inyectamos una nueva tarea urgente al principio (o final) de la cola
-      execSync(`node coordinator.js add "Auto-Fix: Error de Build" "${promptArreglo}" "local" "frontend-turnero/src/App.jsx"`);
-      console.log('⚠️ Tarea de corrección encolada. El agente intentará arreglarlo en el próximo ciclo.');
+      // 1. Detectar si el error es por un paquete no instalado
+      if (contenidoBuild.includes('Failed to resolve import')) {
+        console.log('⚠️ Detectada falta de dependencias (import no resuelto). Instalando automáticamente...');
+        
+        // Extraemos el nombre del paquete del log (ej: "react-router-dom")
+        const match = contenidoBuild.match(/Failed to resolve import "([^"]+)"/);
+        if (match && match[1]) {
+          const paqueteFaltante = match[1];
+          console.log(`[+] Ejecutando npm install ${paqueteFaltante}...`);
+          try {
+             // Instalamos la dependencia en el frontend
+             execSync(`cd frontend-turnero && npm install ${paqueteFaltante}`, { stdio: 'inherit' });
+             console.log('✅ Paquete instalado. El bucle lo reintentará en el próximo ciclo.');
+          } catch (e) {
+             console.log(`[-] Falló la instalación de ${paqueteFaltante}.`);
+          }
+        }
+      } else {
+        // 2. Si es un error de sintaxis o lógica, inyectamos la tarea de auto-corrección a la IA
+        console.log('⚠️ Error de código detectado. Inyectando tarea de auto-corrección a la IA...');
+        const logLimpio = contenidoBuild.substring(0, 400).replace(/["'\n\r]/g, ' ');
+        const promptArreglo = `El último build falló con este error: ${logLimpio}. Revisá las importaciones, sintaxis y corregí el código para que compile. Devolvé EXCLUSIVAMENTE código puro sin comillas.`;
+        
+        execSync(`node coordinator.js add "Auto-Fix: Error de Build" "${promptArreglo}" "local" "frontend-turnero/src/App.jsx"`);
+      }
     }
 
   } catch (error) {
