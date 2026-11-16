@@ -1,9 +1,9 @@
 # Reporte MVP Completo - Nodo ASUS (192.168.0.98)
 - **Fase / Tarea:** tests
 - **Estado:** FALLIDO
-- **Fecha:** 2026-11-16T13:17:02.548Z
+- **Fecha:** 2026-11-16T15:48:17.809Z
 
 ## Resultados de la Ejecución
 ```text
-Faltan componentes críticos: frontend-turnero/src/components/TurnoForm.jsx, frontend-turnero/src/components/TurnoCard.jsx
+Faltan componentes críticos: frontend-turnero/src/App.jsx, frontend-turnero/src/components/TurnoForm.jsx, frontend-turnero/src/components/TurnoCard.jsx
 ```
