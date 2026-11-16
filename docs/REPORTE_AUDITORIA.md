@@ -1,11 +1,11 @@
 # Reporte MVP Completo - Nodo ASUS (192.168.0.98)
 - **Fase / Tarea:** auditoria
 - **Estado:** ÉXITO
-- **Fecha:** 2026-11-16T03:38:06.404Z
+- **Fecha:** 2026-11-16T03:46:21.650Z
 
 ## Resultados de la Ejecución
 ```text
-### Archivos Totales del Proyecto (31)
+### Archivos Totales del Proyecto (32)
 - `coordinator.js`
 - `docs\REPORTE_ASUS.md`
 - `docs\REPORTE_AUDITORIA.md`
@@ -34,6 +34,7 @@
 - `package.json`
 - `pipeline.js`
 - `scripts\asus-worker.mjs`
+- `scripts\loop-mvp.mjs`
 - `scripts\orquestador.mjs`
 - `src\main.jsx`
 - `tasks.db`
