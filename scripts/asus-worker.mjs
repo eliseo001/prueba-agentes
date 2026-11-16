@@ -3,7 +3,7 @@ import path from 'path';
 import { execSync } from 'child_process';
 
 const taskName = process.argv[2] || 'auditoria';
-console.log(`[Nodo ASUS 192.168.0.98] Ejecutando tarea MVP: ${taskName}...`);
+console.log('[Nodo ASUS] Ejecutando tarea MVP: ' + taskName);
 
 let resultadoDetalle = '';
 let estadoTarea = 'ÉXITO';
@@ -25,24 +25,32 @@ try {
         return lista;
       }
       const archivos = listarArchivos(process.cwd());
-      resultadoDetalle = `### Archivos Totales del Proyecto (${archivos.length})\n` + archivos.map(f => `- \`${f}\``).join('\n');
+      resultadoDetalle = '### Archivos Totales del Proyecto (' + archivos.length + ')\n' + archivos.map(function(f) { return '- `' + f + '`'; }).join('\n');
       break;
     }
 
     case 'tests': {
       console.log('Ejecutando suite de pruebas...');
-      resultadoDetalle = execSync('npm test -- --run 2>&1 || echo "No hay tests configurados o fallaron"', { encoding: 'utf-8' });
+      try {
+        resultadoDetalle = execSync('npm test -- --run 2>&1', { encoding: 'utf-8' });
+      } catch (e) {
+        resultadoDetalle = e.stdout || 'Sin tests configurados o fallaron';
+      }
       break;
     }
 
     case 'build': {
       console.log('Verificando compilación (build)...');
-      resultadoDetalle = execSync('npm run build 2>&1 || echo "No hay script de build o falló la compilación"', { encoding: 'utf-8' });
+      try {
+        resultadoDetalle = execSync('npm run build 2>&1', { encoding: 'utf-8' });
+      } catch (e) {
+        resultadoDetalle = e.stdout || 'Sin script de build o falló la compilación';
+      }
       break;
     }
 
     default:
-      resultadoDetalle = `Tarea desconocida o genérica: ${taskName}`;
+      resultadoDetalle = 'Tarea desconocida: ' + taskName;
   }
 } catch (error) {
   estadoTarea = 'FALLIDO';
@@ -54,16 +62,13 @@ if (!fs.existsSync(docsDir)) {
   fs.mkdirSync(docsDir, { recursive: true });
 }
 
-const contenidoReporte = `# Reporte MVP - Nodo ASUS (192.168.0.98)
-- **Fase / Tarea:** ${taskName}
-- **Estado:** ${estadoTarea}
-- **Fecha:** ${new Date().toISOString()}
+const nombreReporte = 'REPORTE_' + taskName.toUpperCase() + '.md';
+const contenidoReporte = '# Reporte MVP - Nodo ASUS (192.168.0.98)\n' +
+  '- **Fase / Tarea:** ' + taskName + '\n' +
+  '- **Estado:** ' + estadoTarea + '\n' +
+  '- **Fecha:** ' + new Date().toISOString() + '\n\n' +
+  '## Resultados de la Ejecución\n' +
+  '```text\n' + resultadoDetalle.trim() + '\n```\n';
 
-## Resultados de la Ejecución
-\`\`\`text
-${resultadoDetalle.trim()}
-\`\``
-`;
-
-fs.writeFileSync(path.join(docsDir, `REPORTE_${taskName.toUpperCase()}.md`), contenidoReporte, 'utf-8');
-console.log(`[Nodo ASUS] Reporte generado: docs/REPORTE_${taskName.toUpperCase()}.md`);
+fs.writeFileSync(path.join(docsDir, nombreReporte), contenidoReporte, 'utf-8');
+console.log('[Nodo ASUS] Reporte generado con éxito en docs/' + nombreReporte);
