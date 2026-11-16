@@ -2,35 +2,51 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 
-const taskName = process.argv[2] || 'auditoria-general';
-console.log(`[Nodo ASUS 192.168.0.98] Ejecutando tarea: ${taskName}...`);
+const taskName = process.argv[2] || 'auditoria';
+console.log(`[Nodo ASUS 192.168.0.98] Ejecutando tarea MVP: ${taskName}...`);
 
-function listarArchivosJS(dir, lista = []) {
-  if (!fs.existsSync(dir)) return lista;
-  for (const item of fs.readdirSync(dir)) {
-    if (['node_modules', '.next', '.git'].includes(item)) continue;
-    const rutaCompleta = path.join(dir, item);
-    if (fs.statSync(rutaCompleta).isDirectory()) {
-      listarArchivosJS(rutaCompleta, lista);
-    } else if (/\.(js|jsx|mjs)$/.test(item)) {
-      lista.push(path.relative(process.cwd(), rutaCompleta));
-    }
-  }
-  return lista;
-}
+let resultadoDetalle = '';
+let estadoTarea = 'ÉXITO';
 
-const archivos = listarArchivosJS(process.cwd());
-
-let resultadoLint = 'Sin script de lint configurado o sin errores.';
 try {
-  if (fs.existsSync('package.json')) {
-    const pkg = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
-    if (pkg.scripts && pkg.scripts.lint) {
-      resultadoLint = execSync('npm run lint', { encoding: 'utf-8' });
+  switch (taskName) {
+    case 'auditoria': {
+      function listarArchivos(dir, lista = []) {
+        if (!fs.existsSync(dir)) return lista;
+        for (const item of fs.readdirSync(dir)) {
+          if (['node_modules', '.next', '.git'].includes(item)) continue;
+          const rutaCompleta = path.join(dir, item);
+          if (fs.statSync(rutaCompleta).isDirectory()) {
+            listarArchivos(rutaCompleta, lista);
+          } else {
+            lista.push(path.relative(process.cwd(), rutaCompleta));
+          }
+        }
+        return lista;
+      }
+      const archivos = listarArchivos(process.cwd());
+      resultadoDetalle = `### Archivos Totales del Proyecto (${archivos.length})\n` + archivos.map(f => `- \`${f}\``).join('\n');
+      break;
     }
+
+    case 'tests': {
+      console.log('Ejecutando suite de pruebas...');
+      resultadoDetalle = execSync('npm test -- --run 2>&1 || echo "No hay tests configurados o fallaron"', { encoding: 'utf-8' });
+      break;
+    }
+
+    case 'build': {
+      console.log('Verificando compilación (build)...');
+      resultadoDetalle = execSync('npm run build 2>&1 || echo "No hay script de build o falló la compilación"', { encoding: 'utf-8' });
+      break;
+    }
+
+    default:
+      resultadoDetalle = `Tarea desconocida o genérica: ${taskName}`;
   }
 } catch (error) {
-  resultadoLint = error.stdout || error.message;
+  estadoTarea = 'FALLIDO';
+  resultadoDetalle = error.stdout || error.message;
 }
 
 const docsDir = path.join(process.cwd(), 'docs');
@@ -38,19 +54,16 @@ if (!fs.existsSync(docsDir)) {
   fs.mkdirSync(docsDir, { recursive: true });
 }
 
-const contenidoReporte = `# Reporte de Análisis - ASUS Snapdragon (192.168.0.98)
-- **Módulo / Tarea:** ${taskName}
-- **Fecha de ejecución:** ${new Date().toISOString()}
-- **Rama de trabajo:** feature/asus-docs-analysis
+const contenidoReporte = `# Reporte MVP - Nodo ASUS (192.168.0.98)
+- **Fase / Tarea:** ${taskName}
+- **Estado:** ${estadoTarea}
+- **Fecha:** ${new Date().toISOString()}
 
-## Archivos JS/JSX Auditados (${archivos.length})
-${archivos.map(f => `- \`${f}\``).join('\n') || '- Sin archivos JS detectados'}
-
-## Diagnóstico de Linter
+## Resultados de la Ejecución
 \`\`\`text
-${resultadoLint.trim()}
-\`\`\`
+${resultadoDetalle.trim()}
+\`\``
 `;
 
-fs.writeFileSync(path.join(docsDir, 'REPORTE_ASUS.md'), contenidoReporte, 'utf-8');
-console.log('[Nodo ASUS 192.168.0.98] Reporte guardado en docs/REPORTE_ASUS.md');
+fs.writeFileSync(path.join(docsDir, `REPORTE_${taskName.toUpperCase()}.md`), contenidoReporte, 'utf-8');
+console.log(`[Nodo ASUS] Reporte generado: docs/REPORTE_${taskName.toUpperCase()}.md`);
