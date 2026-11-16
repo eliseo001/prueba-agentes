@@ -1,11 +1,11 @@
 # Reporte MVP Completo - Nodo ASUS (192.168.0.98)
 - **Fase / Tarea:** auditoria
 - **Estado:** ÉXITO
-- **Fecha:** 2026-11-16T03:54:35.223Z
+- **Fecha:** 2026-11-16T04:13:27.917Z
 
 ## Resultados de la Ejecución
 ```text
-### Archivos Totales del Proyecto (36)
+### Archivos Totales del Proyecto (42)
 - `coordinator.js`
 - `docs\REPORTE_ASUS.md`
 - `docs\REPORTE_AUDITORIA.md`
@@ -27,7 +27,13 @@
 - `frontend-turnero\src\components\TurnoCard.jsx`
 - `frontend-turnero\src\components\TurnoForm.jsx`
 - `frontend-turnero\src\context\AuthContext.jsx`
+- `frontend-turnero\src\features\calendar\Calendario.jsx`
+- `frontend-turnero\src\features\clientes\Clientes.jsx`
 - `frontend-turnero\src\features\dashboard\Dashboard.jsx`
+- `frontend-turnero\src\features\profesionales\Profesionales.jsx`
+- `frontend-turnero\src\features\public\ReservasPublicas.jsx`
+- `frontend-turnero\src\features\servicios\Servicios.jsx`
+- `frontend-turnero\src\features\turnos\Turnos.jsx`
 - `frontend-turnero\src\index.css`
 - `frontend-turnero\src\main.jsx`
 - `frontend-turnero\vite.config.js`
