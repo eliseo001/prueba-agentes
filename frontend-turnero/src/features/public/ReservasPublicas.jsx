@@ -1,87 +1,50 @@
-```jsx
 import React, { useState } from 'react';
 
 const ReservasPublicas = () => {
-  const [servicio, setServicio] = useState('');
-  const [profesional, setProfesional] = useState('');
-  const [horario, setHorario] = useState('');
-  const [nombre, setNombre] = useState('');
-  const [telefono, setTelefono] = useState('');
+    const [servicio, setServicio] = useState('');
+    const [profesional, setProfesional] = useState('');
+    const [horario, setHorario] = useState('');
+    const [nombre, setNombre] = useState('');
+    const [telefono, setTelefono] = useState('');
 
-  const servicios = ['Massaje', 'Corte de Pelo', 'Uñas'];
-  const profesionales = ['Juan Perez', 'Maria Lopez'];
-  const horarios = ['10:00 AM', '12:00 PM', '2:00 PM'];
+    const servicios = ['Corte de Pelo', 'Tinte', 'Manicure'];
+    const profesionales = ['Juan', 'María', 'Pedro'];
+    const horarios = ['10:00 AM', '12:00 PM', '2:00 PM'];
 
-  const handleReservar = () => {
-    // Aquí iría la lógica para guardar la reserva
-    console.log('Servicio:', servicio);
-    console.log('Profesional:', profesional);
-    console.log('Horario:', horario);
-    console.log('Nombre:', nombre);
-    console.log('Teléfono:', telefono);
-  };
+    const handleReservar = () => {
+        // Lógica para reservar
+        alert('Reserva realizada con éxito!');
+    };
 
-  return (
-    <div className="p-4 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Reserva tu cita</h1>
-      <select
-        value={servicio}
-        onChange={(e) => setServicio(e.target.value)}
-        className="block w-full p-2 border rounded mb-4"
-      >
-        <option disabled value="">Selecciona un servicio</option>
-        {servicios.map((s, index) => (
-          <option key={index} value={s}>{s}</option>
-        ))}
-      </select>
-
-      <select
-        value={profesional}
-        onChange={(e) => setProfesional(e.target.value)}
-        className="block w-full p-2 border rounded mb-4"
-      >
-        <option disabled value="">Selecciona un profesional</option>
-        {profesionales.map((p, index) => (
-          <option key={index} value={p}>{p}</option>
-        ))}
-      </select>
-
-      <select
-        value={horario}
-        onChange={(e) => setHorario(e.target.value)}
-        className="block w-full p-2 border rounded mb-4"
-      >
-        <option disabled value="">Selecciona un horario</option>
-        {horarios.map((h, index) => (
-          <option key={index} value={h}>{h}</option>
-        ))}
-      </select>
-
-      <input
-        type="text"
-        value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
-        placeholder="Nombre completo"
-        className="block w-full p-2 border rounded mb-4"
-      />
-
-      <input
-        type="tel"
-        value={telefono}
-        onChange={(e) => setTelefono(e.target.value)}
-        placeholder="Teléfono"
-        className="block w-full p-2 border rounded mb-4"
-      />
-
-      <button
-        onClick={handleReservar}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        Reservar
-      </button>
-    </div>
-  );
+    return (
+        <div className="p-4">
+            <h1 className="text-xl font-bold mb-4">Realizar Reserva</h1>
+            <select value={servicio} onChange={(e) => setServicio(e.target.value)} className="border p-2 mb-4 w-full">
+                {servicios.map((s, index) => (
+                    <option key={index} value={s}>{s}</option>
+                ))}
+            </select>
+            <select value={profesional} onChange={(e) => setProfesional(e.target.value)} className="border p-2 mb-4 w-full">
+                {profesionales.map((p, index) => (
+                    <option key={index} value={p}>{p}</option>
+                ))}
+            </select>
+            <div className="grid grid-cols-3 gap-4">
+                {horarios.map((h, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setHorario(h)}
+                        className={`border p-2 ${horario === h ? 'bg-blue-500 text-white' : ''}`}
+                    >
+                        {h}
+                    </button>
+                ))}
+            </div>
+            <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Nombre" className="border p-2 mb-4 w-full" />
+            <input type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono" className="border p-2 mb-4 w-full" />
+            <button onClick={handleReservar} className="bg-blue-500 text-white border p-2 w-full">Reservar</button>
+        </div>
+    );
 };
 
 export default ReservasPublicas;
-```

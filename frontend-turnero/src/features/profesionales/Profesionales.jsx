@@ -1,26 +1,26 @@
 import React from 'react';
-import { LuBarberShop } from 'lucide-react';
+import { IconUser } from '@tabler/icons-react';
 
 const Profesionales = () => {
+  const barberos = [
+    { nombre: 'Juan Pérez', especialidad: 'Barbero de cabellera' },
+    { nombre: 'Ana López', especialidad: 'Cortes personalizados' },
+    { nombre: 'Carlos Martínez', especialidad: 'Peinados creativos' }
+  ];
+
   return (
-    <div className="container mx-auto py-8">
-      <h2 className="text-4xl font-bold mb-6">Nuestros Barberos</h2>
-      <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <li className="bg-white p-4 shadow rounded-lg hover:bg-gray-100">
-          <LuBarberShop size={24} className="mb-2" />
-          <h3 className="text-xl font-semibold">Juan Pérez</h3>
-          <p>Experto en trajes de punta</p>
-        </li>
-        <li className="bg-white p-4 shadow rounded-lg hover:bg-gray-100">
-          <LuBarberShop size={24} className="mb-2" />
-          <h3 className="text-xl font-semibold">Pedro Rodríguez</h3>
-          <p>Maestro del corte estilo suizo</p>
-        </li>
-        <li className="bg-white p-4 shadow rounded-lg hover:bg-gray-100">
-          <LuBarberShop size={24} className="mb-2" />
-          <h3 className="text-xl font-semibold">Luisa Fernández</h3>
-          <p>Profesional en recortes modernos</p>
-        </li>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Nuestros Barberos</h1>
+      <ul className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {barberos.map((barbero, index) => (
+          <li key={index} className="bg-white shadow-lg p-4 rounded-md">
+            <div className="flex items-center mb-2">
+              <IconUser className="text-xl text-blue-500 mr-2" />
+              <span>{barbero.nombre}</span>
+            </div>
+            <p className="text-gray-700">{barbero.especialidad}</p>
+          </li>
+        ))}
       </ul>
     </div>
   );
